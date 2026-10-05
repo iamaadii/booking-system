@@ -25,8 +25,8 @@ router.get("/shows/:id/seats", async (req, res) => {
 
     const seatResult = await pool.query(
       "SELECT id, seat_number, " +
-        "CASE WHEN status = 'held' AND hold_expires_at <= NOW() THEN 'available' ELSE status END AS status " +
-        "FROM seats WHERE show_id = ? ORDER BY seat_number",
+      "CASE WHEN status = 'held' AND hold_expires_at <= NOW() THEN 'available' ELSE status END AS status " +
+      "FROM seats WHERE show_id = ? ORDER BY seat_number",
       [showId]
     );
     const seatRows = seatResult[0];
