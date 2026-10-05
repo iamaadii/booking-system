@@ -109,3 +109,53 @@ export async function bookSeat(userId, seatId) {
     connection.release();
   }
 }
+
+export async function cancelBooking(userId, bookingId) {
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const bookingResult = await connection.query(
+      "SELECT id, user_id, seat_id, status FROM bookings WHERE id = ? FOR UPDATE",
+      [bookingId]
+    );
+    const bookingRows = bookingResult[0];
+
+    if (bookingRows.length === 0) {
+      await connection.rollback();
+      return { ok: false, status: 404, message: "Booking not found" };
+    }
+
+    const booking = bookingRows[0];
+
+    if (booking.user_id !== userId) {
+      await connection.rollback();
+      return { ok: false, status: 404, message: "Booking not found" };
+    }
+
+    if (booking.status === "cancelled") {
+      await connection.rollback();
+      return { ok: false, status: 409, message: "Booking is already cancelled" };
+    }
+
+    await connection.query(
+      "UPDATE bookings SET status = 'cancelled', active_seat_id = NULL WHERE id = ?",
+      [bookingId]
+    );
+
+    await connection.query(
+      "UPDATE seats SET status = 'available', held_by = NULL, hold_expires_at = NULL WHERE id = ?",
+      [booking.seat_id]
+    );
+
+    await connection.commit();
+
+    return { ok: true, message: "Booking cancelled" };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+}
