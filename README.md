@@ -1,6 +1,6 @@
 # Booking System with Concurrency Handling
 
-A backend for booking seats (movie shows in this demo) where **the same seat can never be sold twice**, even when many users click "Book" at the same moment.
+A backend booking system that prevents the same seat from being booked twice, even when multiple users try to book it at the same time.
 
 ## What problem does it solve?
 
@@ -21,7 +21,14 @@ This project stops that. It uses database transactions and row locks, so the sec
 
 ## Tech Stack
 
-Node.js, Express.js, MySQL, JWT, bcrypt, Docker, Docker Compose, Node's built-in test runner
+
+
+<p >
+  <img src="https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs&logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/Express-API-000000?logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker">
+</p>
 
 ## How a booking works
 
@@ -125,31 +132,7 @@ The tests create their own users, show and seats, and delete them at the end. Th
 - A held seat can't be booked by others, but the holder can book it
 - Cancelling the same booking 5 times at once frees the seat only once
 
-<br>
 
-## Project structure
-
-```
-src/
-  app.js                      routes are connected here
-  server.js                   starts the server
-  db.js                       MySQL connection pool
-  routes/
-    authRoutes.js             signup, login, me
-    seatRoutes.js             list seats, hold, book
-    bookingRoutes.js          history, cancel
-  services/
-    bookingService.js         transactions: hold, book, cancel
-  middleware/
-    requireLogin.js           checks the JWT token
-db/
-  schema.sql                  tables
-  seed.sql                    demo show and seats
-tests/
-  concurrency.test.js         concurrency tests
-Dockerfile
-docker-compose.yml
-```
 
 ## Design decisions
 
@@ -163,9 +146,5 @@ docker-compose.yml
 - **User ID comes from the token, never from the request body.**
 
 ## Limits and ideas for later
-
-- Payments are simulated; there is no real payment flow
 - Tested on one app server and one database; not load tested at large scale
-- A small cleanup job could remove old expired holds
 - A seat-grid page in React would make the demo easier to see
-- Rate limiting on login and booking routes (see my Rate Limiter Service project)
